@@ -1,0 +1,766 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>MK Morning Cards</title>
+<meta name="theme-color" content="#171426">
+<meta name="description" content="Daily Good Morning cards with the MK signature, ready to share on WhatsApp.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MK Cards">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Karla:wght@400;600;700&display=swap">
+<style>
+/* Layout: one centred column — the card is the hero, controls sit under it like a darkroom tray. Single dawn-dark look by choice. */
+:root{
+  --ink:#171426;        /* page ground: pre-dawn indigo */
+  --panel:#221d36;      /* raised surfaces */
+  --line:#3a3354;       /* hairlines */
+  --text:#f3ecdf;       /* warm paper white */
+  --muted:#b3a9c4;      /* secondary text */
+  --gold:#e3bd78;       /* signature gold accent */
+  --gold-deep:#b98a3e;
+  --festive:#f08a5d;    /* festival chip */
+  --f-display:"Playfair Display",Georgia,"Times New Roman",serif;
+  --f-quote:"Cormorant Garamond",Georgia,serif;
+  --f-ui:"Karla",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+body{background:var(--ink);color:var(--text);font-family:var(--f-ui);font-size:15px;line-height:1.5}
+.wrap{max-width:600px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-size:1.55rem;margin:0;letter-spacing:.01em;color:var(--gold);text-wrap:balance}
+.when{font-size:.82rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.status{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.95rem}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);color:var(--muted)}
+.chip.fest{border-color:var(--festive);color:var(--festive)}
+.card{position:relative;width:100%;max-width:100%;aspect-ratio:1/1;border-radius:6px;overflow:hidden;background:var(--panel);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.card img{display:block;width:100%;height:100%;object-fit:cover}
+.card .loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:.9rem}
+.daynav{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px}
+.daynav .mid{text-align:center;font-family:var(--f-quote);font-size:1.25rem;font-weight:600;min-width:0}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 14px;min-height:44px}
+button:hover{border-color:var(--gold-deep)}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button.primary{display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(180deg,var(--gold),var(--gold-deep));color:#1d1406;border:none;font-weight:700;font-size:1.02rem;width:100%}
+#dlBtn{width:100%}
+button.primary:disabled{opacity:.6;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row button{flex:1 1 0;min-width:120px}
+.icon{width:44px;padding:0;font-size:1.2rem}
+.note{font-size:.85rem;color:var(--muted);margin:0}
+.note b{color:var(--text)}
+.toast{font-size:.9rem;color:var(--gold);min-height:1.4em;margin:0}
+.editor{display:flex;flex-direction:column;gap:8px}
+textarea{font-family:var(--f-quote);font-size:1.15rem;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px;min-height:90px;resize:vertical}
+section h2{font-family:var(--f-display);font-size:1.1rem;margin:0 0 8px;color:var(--text)}
+.fests{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.fests li{border-top:1px solid var(--line)}
+.fests button{width:100%;display:grid;grid-template-columns:92px 1fr auto;gap:10px;align-items:center;text-align:left;background:none;border:none;border-radius:0;padding:10px 2px}
+.fests .d{font-variant-numeric:tabular-nums;color:var(--gold);font-weight:600;font-size:.9rem}
+.fests .n{min-width:0}
+.fests .a{color:var(--muted);font-size:.8rem}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.card img{transition:opacity .35s ease}}
+</style>
+</head><body><div class="wrap">
+  <header>
+    <h1>MK Morning Cards</h1>
+    <span class="when" id="when">New card every day at 12:00 AM</span>
+  </header>
+
+  <div class="status" id="status"></div>
+
+  <div class="card">
+    <img id="cardImg" alt="Today's Good Morning card">
+    <div class="loading" id="loading">Painting today's sunrise…</div>
+  </div>
+
+  <div class="daynav">
+    <button class="icon" id="prevDay" aria-label="Previous day">‹</button>
+    <div class="mid" id="dayLabel"></div>
+    <button class="icon" id="nextDay" aria-label="Next day">›</button>
+  </div>
+
+  <button class="primary" id="saveBtn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c0-.1-.2-.2-.5-.3Z"/></svg><span>Share to WhatsApp</span></button>
+  <button id="dlBtn">Download card</button>
+  <p class="toast" id="toast" role="status"></p>
+
+  <div class="row">
+    <button id="newQuote">Another quote</button>
+    <button id="newScene">Another background</button>
+    <button id="editQuote">Edit quote</button>
+  </div>
+  <div class="row" id="todayRow" hidden><button id="goToday">Back to today</button></div>
+
+  <div class="editor" id="editor" hidden>
+    <textarea id="quoteText" aria-label="Quote text"></textarea>
+    <div class="row"><button id="applyQuote">Use this quote</button><button id="resetQuote">Reset</button></div>
+  </div>
+
+  <p class="note" id="howto">Tap <b>Share to WhatsApp</b>, choose <b>WhatsApp</b> in the share menu, then pick a chat or <b>My status</b>. Tip: use your browser's <b>Add to Home screen</b> to keep this as an app.</p>
+
+  <section>
+    <h2>Coming up</h2>
+    <ul class="fests" id="fests"></ul>
+  </section>
+</div>
+<canvas id="cv" width="1080" height="1080" hidden></canvas>
+<script>
+const SIG_SRC="data:image/png;base64,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";
+const QUOTES = [
+"Start where you are. Use what you have. Do what you can.",
+"Every morning is a fresh beginning. Make it count.",
+"The sun rises without asking permission. So can your dreams.",
+"Small steps every day add up to big changes.",
+"Be the reason someone smiles today.",
+"A calm mind brings inner strength and self-confidence.",
+"Gratitude turns what we have into enough.",
+"Today is a gift. That is why it is called the present.",
+"Rise up, start fresh, see the bright opportunity in each day.",
+"Kindness is a language everyone understands.",
+"Your only limit is your mind.",
+"Believe you can, and you are halfway there.",
+"Do something today that your future self will thank you for.",
+"Happiness is not by chance, but by choice.",
+"The best view comes after the hardest climb.",
+"Let your faith be bigger than your fears.",
+"Wake up with determination. Go to bed with satisfaction.",
+"A positive thought in the morning can change your whole day.",
+"Difficult roads often lead to beautiful destinations.",
+"Stay close to people who feel like sunshine.",
+"Every sunrise is an invitation to brighten someone's day.",
+"The secret of getting ahead is getting started.",
+"What you do today can improve all your tomorrows.",
+"Peace begins with a smile.",
+"Be patient. Good things take time.",
+"Life is short. Make every morning a blessing.",
+"Your attitude determines your direction.",
+"The more you praise and celebrate your life, the more there is to celebrate.",
+"Do small things with great love.",
+"Count your blessings, not your problems.",
+"Health is the greatest wealth.",
+"A good morning begins with a thankful heart.",
+"Dream big. Start small. Act now.",
+"Don't wait for opportunity. Create it.",
+"Progress, not perfection.",
+"Be gentle with yourself. You are doing the best you can.",
+"Where there is love, there is life.",
+"The best is yet to come.",
+"Each new day is a blank page. Write a good story.",
+"Keep your face to the sunshine and you cannot see the shadows.",
+"Good thoughts bring good things.",
+"Success is the sum of small efforts, repeated day in and day out.",
+"Choose joy. Every single morning.",
+"Strength grows in the moments when you think you can't go on but keep going anyway.",
+"The mountains are calling. So is your purpose.",
+"Silence is sometimes the best answer.",
+"Be a light, not a judge.",
+"Simplicity is the ultimate sophistication.",
+"Hard work beats talent when talent doesn't work hard.",
+"A smile is the prettiest thing you can wear.",
+"Worry less. Smile more.",
+"Your future is created by what you do today, not tomorrow.",
+"Let today be the day you give up who you've been for who you can become.",
+"Nothing is impossible. The word itself says 'I'm possible.'",
+"Happiness is a direction, not a place.",
+"Be humble. Be kind. Be thankful.",
+"When you focus on the good, the good gets better.",
+"One kind word can warm three winter months.",
+"The early morning has gold in its mouth.",
+"New day, new thoughts, new hopes, new opportunities.",
+"Feed your faith and your fears will starve.",
+"Patience is bitter, but its fruit is sweet.",
+"What we think, we become.",
+"Live simply. Give generously. Love deeply.",
+"Every day may not be good, but there is something good in every day.",
+"Learn from yesterday, live for today, hope for tomorrow.",
+"The harder you work for something, the greater you'll feel when you achieve it.",
+"Do what is right, not what is easy.",
+"Your smile can change the world. Don't let the world change your smile.",
+"Knowledge is the treasure that follows its owner everywhere.",
+"Morning prayers lead to a blessed day.",
+"A grateful heart is a magnet for miracles.",
+"Opportunities don't happen. You create them.",
+"Discipline is the bridge between goals and accomplishment.",
+"Great things never come from comfort zones.",
+"Be so good they can't ignore you.",
+"It always seems impossible until it's done.",
+"The only way to do great work is to love what you do.",
+"Fall seven times, stand up eight.",
+"Inhale courage. Exhale fear.",
+"Family is where life begins and love never ends.",
+"True friends are the family we choose.",
+"Each morning we are born again. What we do today matters most.",
+"Don't count the days. Make the days count.",
+"Mistakes are proof that you are trying.",
+"A journey of a thousand miles begins with a single step.",
+"Believe in yourself and all that you are.",
+"Life becomes easier when you learn to accept an apology you never got.",
+"The purpose of life is a life of purpose.",
+"Be the energy you want to attract.",
+"Old ways won't open new doors.",
+"Focus on the step in front of you, not the whole staircase.",
+"When you can't find the sunshine, be the sunshine.",
+"Your mind is a garden. Your thoughts are the seeds.",
+"Doubt kills more dreams than failure ever will.",
+"Stars can't shine without darkness.",
+"With the new day comes new strength and new thoughts.",
+"Tough times never last, but tough people do.",
+"Serve, love, give, purify, meditate, realise.",
+"Respect is earned. Honesty is appreciated. Trust is gained.",
+"Your vibe attracts your tribe.",
+"Water the flowers, not the weeds.",
+"Every accomplishment starts with the decision to try.",
+"The best time to plant a tree was twenty years ago. The second best time is now.",
+"Well begun is half done.",
+"Be thankful for what you have. You'll end up having more.",
+"Where focus goes, energy flows.",
+"Some days you just have to create your own sunshine.",
+"A day without laughter is a day wasted.",
+"Blessed are those who give without remembering and take without forgetting.",
+"Morning is wonderful. Its only drawback is that it comes at such an inconvenient time of day.",
+"Hope is the heartbeat of the soul.",
+"If opportunity doesn't knock, build a door.",
+"Let your light shine so bright that others can see their way out of the dark.",
+"Be a voice, not an echo.",
+"Calm seas never made skilled sailors.",
+"The mind is everything. What you think, you become.",
+"Joy is found in the simplest moments.",
+"Time and tide wait for none. Begin today.",
+"A good laugh and a long sleep are the best cures.",
+"Keep going. Everything you need will come to you at the perfect time.",
+"You are stronger than you think.",
+"Wherever you go, go with all your heart.",
+"Love all, trust a few, do wrong to none.",
+"Make today so awesome that yesterday gets jealous.",
+"Collect moments, not things.",
+"Speak kindly. Words have power.",
+"Be happy with what you have while working for what you want.",
+"Honesty is the best policy.",
+"The world needs your light today.",
+"Look up, smile, and begin.",
+"Your present circumstances don't determine where you can go.",
+"Don't let yesterday take up too much of today.",
+"Blessings come in many forms. Notice them.",
+"Good morning is not just a greeting. It's a wish for a beautiful day.",
+"Let go of what you can't control.",
+"The sun is a daily reminder that we too can rise again.",
+"Be curious, not judgmental.",
+"Be the change you wish to see.",
+"Invest in yourself. It pays the best interest.",
+"You don't have to be great to start, but you have to start to be great.",
+"Happiness shared is happiness doubled.",
+"Every day is a second chance.",
+"Walk with dreams, work with purpose.",
+"Nature does not hurry, yet everything is accomplished.",
+"Plant kindness and gather love.",
+"A cheerful heart is good medicine.",
+"May your coffee be strong and your day be gentle.",
+"Positive mind. Positive vibes. Positive life.",
+"The best project you'll ever work on is you.",
+"Your life does not get better by chance. It gets better by change.",
+"Say yes to new adventures.",
+"Let every morning remind you how lucky you are to be alive.",
+"Enjoy the little things. One day you may look back and realise they were the big things.",
+"You are never too old to set another goal or to dream a new dream.",
+"Contentment is natural wealth.",
+"Anger is one letter short of danger.",
+"The tongue has no bones, but it is strong enough to break a heart. Be kind.",
+"Life is like riding a bicycle. To keep your balance, you must keep moving.",
+"Stay humble. Work hard. Be kind.",
+"Today's accomplishments were yesterday's impossibilities.",
+"There is always, always something to be thankful for."
+];
+
+/* Festival calendar. dates: single "YYYY-MM-DD" or [start,end] inclusive.
+   Earlier entries win when two overlap. Lunar dates verified for 2026–27;
+   Eid dates depend on moon sighting and may shift by a day. */
+const FESTIVALS = [
+ {id:"newyear", name:"New Year", greet:"Happy New Year", theme:"newyear", dates:["2027-01-01","2028-01-01"],
+  wishes:["New year, new hopes, new dreams. Wishing you a joyful year ahead.","May the year ahead bring health, peace and happiness to your home."]},
+ {id:"sankranti", name:"Makar Sankranti & Pongal", greet:"Happy Makar Sankranti", theme:"sankranti", dates:[["2027-01-14","2027-01-15"]],
+  wishes:["May your life soar high like colourful kites in the sky.","Til-gul ghya, god god bola. Sweet words, sweet days ahead."]},
+ {id:"republic", name:"Republic Day", greet:"Happy Republic Day", theme:"national", dates:["2027-01-26","2028-01-26"],
+  wishes:["Proud to be Indian. Wishing you a very happy Republic Day.","Let us honour the Constitution and the values that unite us."]},
+ {id:"vasant", name:"Vasant Panchami", greet:"Happy Vasant Panchami", theme:"vasant", dates:["2027-02-11"],
+  wishes:["May Goddess Saraswati bless you with wisdom and knowledge.","Welcome spring with a heart full of learning and light."]},
+ {id:"shivaratri", name:"Maha Shivaratri", greet:"Happy Maha Shivaratri", theme:"shivaratri", dates:["2027-03-06"],
+  wishes:["Om Namah Shivaya. May Lord Shiva bless you with strength and peace.","May this holy night fill your life with light and devotion."]},
+ {id:"eidfitr", name:"Eid ul-Fitr", greet:"Eid Mubarak", theme:"eid", dates:["2027-03-10"],
+  wishes:["May this Eid bring peace, happiness and prosperity to your home.","Wishing you and your family a blessed and joyous Eid."]},
+ {id:"holi", name:"Holi", greet:"Happy Holi", theme:"holi", dates:[["2027-03-22","2027-03-22"]],
+  wishes:["May the colours of Holi fill your life with joy and love.","Let's paint the day with smiles, colours and happiness."]},
+ {id:"easter", name:"Easter", greet:"Happy Easter", theme:"easter", dates:["2027-03-28"],
+  wishes:["May the joy of Easter fill your heart with hope and peace.","New life, new hope, new beginnings. Happy Easter."]},
+ {id:"ugadi", name:"Ugadi & Gudi Padwa", greet:"Happy Ugadi", theme:"ugadi", dates:["2026-03-19","2027-04-07"],
+  wishes:["May this new year bring sweetness, health and success.","A new year begins. May every day be as sweet as the first."]},
+ {id:"baisakhi", name:"Baisakhi", greet:"Happy Baisakhi", theme:"baisakhi", dates:["2027-04-14"],
+  wishes:["May the golden harvest bring abundance and joy to your home.","Wishing you a season of prosperity and celebration."]},
+ {id:"ramnavami", name:"Ram Navami", greet:"Happy Ram Navami", theme:"puja", dates:["2027-04-15"],
+  wishes:["May Lord Rama bless you with virtue, courage and peace.","Jai Shri Ram. Wishing you a blessed Ram Navami."]},
+ {id:"eidadha", name:"Eid al-Adha", greet:"Eid Mubarak", theme:"eid", dates:["2027-05-17"],
+  wishes:["May Allah accept your sacrifices and bless you with happiness.","Wishing you peace, faith and togetherness this Bakrid."]},
+ {id:"buddha", name:"Buddha Purnima", greet:"Happy Buddha Purnima", theme:"buddha", dates:["2027-05-20"],
+  wishes:["May the light of wisdom guide you on the path of peace.","Peace comes from within. Wishing you a serene Buddha Purnima."]},
+ {id:"gurupurnima", name:"Guru Purnima", greet:"Happy Guru Purnima", theme:"puja", dates:["2027-07-18"],
+  wishes:["Gratitude to every teacher who lit a lamp in our lives.","A guru shows the way. Wishing you a blessed Guru Purnima."]},
+ {id:"independence", name:"Independence Day", greet:"Happy Independence Day", theme:"national", dates:["2027-08-15"],
+  wishes:["Freedom in our minds, faith in our words, pride in our hearts.","Salute to the heroes who gave us freedom. Jai Hind."]},
+ {id:"rakhi", name:"Raksha Bandhan", greet:"Happy Raksha Bandhan", theme:"rakhi", dates:["2027-08-17"],
+  wishes:["A thread of love, a bond of care. Happy Raksha Bandhan.","Celebrating the beautiful bond between brothers and sisters."]},
+ {id:"janmashtami", name:"Krishna Janmashtami", greet:"Happy Janmashtami", theme:"janmashtami", dates:["2027-08-25"],
+  wishes:["May Lord Krishna fill your life with love and joy.","Jai Shri Krishna. Wishing you a blessed Janmashtami."]},
+ {id:"ganesh", name:"Ganesh Chaturthi", greet:"Happy Ganesh Chaturthi", theme:"ganesh", dates:[["2027-09-04","2027-09-05"]],
+  wishes:["Ganpati Bappa Morya! May he remove every obstacle from your path.","May Lord Ganesha bless your home with wisdom and prosperity."]},
+ {id:"onam", name:"Onam", greet:"Happy Onam", theme:"onam", dates:["2027-09-12"],
+  wishes:["May this Onam bring happiness, prosperity and good health.","Wishing you a festive and flowery Onam with your loved ones."]},
+ {id:"gandhi", name:"Gandhi Jayanti", greet:"Gandhi Jayanti", theme:"national", dates:["2026-10-02","2027-10-02"],
+  wishes:["Truth and non-violence. Remembering Bapu with gratitude.","Simple living and high thinking. Let's walk Bapu's path today."]},
+ {id:"dussehra", name:"Dussehra", greet:"Happy Dussehra", theme:"dussehra", dates:["2026-10-20","2027-10-09"],
+  wishes:["May good always triumph over evil in your life.","Wishing you victory, courage and success this Vijayadashami."]},
+ {id:"navratri", name:"Navratri", greet:"Happy Navratri", theme:"navratri", dates:[["2026-10-11","2026-10-19"],["2027-09-30","2027-10-08"]],
+  wishes:["May Maa Durga bless you with strength, joy and prosperity.","Nine nights of devotion, dance and divine blessings."]},
+ {id:"dhanteras", name:"Dhanteras", greet:"Happy Dhanteras", theme:"diwali", dates:["2026-11-06","2027-10-26"],
+  wishes:["May Goddess Lakshmi bless your home with wealth and health.","Wishing you a prosperous and bright Dhanteras."]},
+ {id:"diwali", name:"Diwali", greet:"Happy Diwali", theme:"diwali", dates:[["2026-11-07","2026-11-09"],["2027-10-27","2027-10-29"]],
+  wishes:["May the light of the diyas fill your life with joy and prosperity.","Wishing you a sparkling Diwali full of sweets, smiles and lights."]},
+ {id:"padwa", name:"Balipadyami & Govardhan Puja", greet:"Happy Padwa", theme:"diwali", dates:["2026-11-10","2027-10-30"],
+  wishes:["May the new year of light bring you happiness and success.","Wishing you abundance, love and a bright year ahead."]},
+ {id:"bhaidooj", name:"Bhai Dooj", greet:"Happy Bhai Dooj", theme:"rakhi", dates:["2026-11-11","2027-10-31"],
+  wishes:["A bond of love and protection. Happy Bhai Dooj.","Celebrating the love between brothers and sisters."]},
+ {id:"chhath", name:"Chhath Puja", greet:"Happy Chhath Puja", theme:"chhath", dates:["2026-11-15","2027-11-04"],
+  wishes:["May the Sun God bless you with health and happiness.","Offering gratitude to the rising sun. Happy Chhath."]},
+ {id:"gurpurab", name:"Guru Nanak Jayanti", greet:"Happy Gurpurab", theme:"gurpurab", dates:["2026-11-24","2027-11-14"],
+  wishes:["May Guru Nanak Dev Ji's teachings guide you towards truth and kindness.","Wishing you peace and light this Gurpurab."]},
+ {id:"christmas", name:"Christmas", greet:"Merry Christmas", theme:"christmas", dates:[["2026-12-24","2026-12-25"],["2027-12-24","2027-12-25"]],
+  wishes:["May the magic of Christmas fill your heart with joy and peace.","Wishing you warmth, love and blessings this Christmas."]}
+];
+
+/* ---------- painting engine: every background is drawn on a 1080×1080 canvas ---------- */
+const W = 1080, H = 1080;
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hashStr(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+const lerp=(a,b,t)=>a+(b-a)*t;
+function hex(c){c=c.replace('#','');return[parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)]}
+function mix(c1,c2,t){const a=hex(c1),b=hex(c2);return'#'+a.map((v,i)=>Math.round(lerp(v,b[i],t)).toString(16).padStart(2,'0')).join('')}
+function rgba(c,a){const[r,g,b]=hex(c);return`rgba(${r},${g},${b},${a})`}
+
+function vgrad(ctx,y0,y1,stops){const g=ctx.createLinearGradient(0,y0,0,y1);stops.forEach(([o,c])=>g.addColorStop(o,c));return g}
+function sky(ctx,stops,y1=H){ctx.fillStyle=vgrad(ctx,0,y1,stops);ctx.fillRect(0,0,W,y1)}
+function glow(ctx,x,y,r,color,a=1){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,rgba(color,a));g.addColorStop(1,rgba(color,0));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function sun(ctx,x,y,r,{core='#fffbe8',halo='#ffcf7a',rays=true,rng=Math.random}={}){
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  glow(ctx,x,y,r*14,halo,.35);glow(ctx,x,y,r*5,halo,.55);
+  if(rays){for(let i=0;i<22;i++){const a=(i/22)*Math.PI*2+rng()*.1,l=r*(3+rng()*4);
+    const g=ctx.createLinearGradient(x,y,x+Math.cos(a)*l,y+Math.sin(a)*l);g.addColorStop(0,rgba(halo,.55));g.addColorStop(1,rgba(halo,0));
+    ctx.strokeStyle=g;ctx.lineWidth=2+rng()*3;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);ctx.stroke()}}
+  ctx.restore();glow(ctx,x,y,r*1.6,core,.9);ctx.fillStyle=core;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function moon(ctx,x,y,r,{crescent=false,color='#fff6dc',bg='#0b1330'}={}){
+  glow(ctx,x,y,r*5,color,.25);ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+  if(crescent){ctx.fillStyle=bg;ctx.beginPath();ctx.arc(x+r*.42,y-r*.18,r*.9,0,Math.PI*2);ctx.fill()}}
+function stars(ctx,rng,n,y1,col='#ffffff'){for(let i=0;i<n;i++){const x=rng()*W,y=rng()*y1,s=rng()*1.8+.3;ctx.fillStyle=rgba(col,.35+rng()*.6);ctx.beginPath();ctx.arc(x,y,s,0,Math.PI*2);ctx.fill()}}
+function birds(ctx,rng,n,x0,y0,spread,col='#2a2230'){ctx.strokeStyle=col;ctx.lineCap='round';for(let i=0;i<n;i++){const x=x0+(rng()-.5)*spread,y=y0+(rng()-.5)*spread*.35,s=6+rng()*9;ctx.lineWidth=1.6+s*.12;ctx.beginPath();ctx.moveTo(x-s,y-s*.35);ctx.quadraticCurveTo(x-s*.4,y-s*.5,x,y);ctx.quadraticCurveTo(x+s*.4,y-s*.5,x+s,y-s*.35);ctx.stroke()}}
+/* midpoint-displacement ridge */
+function ridge(rng,y0,amp,rough=.55,levels=8){let pts=[y0+(rng()-.5)*amp,y0+(rng()-.5)*amp];let sc=amp;
+  for(let l=0;l<levels;l++){const n=[];for(let i=0;i<pts.length-1;i++){n.push(pts[i]);n.push((pts[i]+pts[i+1])/2+(rng()-.5)*sc)}n.push(pts[pts.length-1]);pts=n;sc*=rough}
+  return pts.map((y,i)=>[-20+i*(W+40)/(pts.length-1),y])}
+function peakRidge(rng,base,peaks,amp){/* ridge with explicit peaks */const p=ridge(rng,base,amp*.35,.52,8);
+  return p.map(([x,y])=>{let d=0;peaks.forEach(([px,ph,pw])=>{d+=ph*Math.exp(-((x-px)**2)/(2*pw*pw))});return[x,y-d]})}
+function fillRidge(ctx,pts,fill,bottom=H){ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(pts[0][0],bottom);pts.forEach(([x,y])=>ctx.lineTo(x,y));ctx.lineTo(pts[pts.length-1][0],bottom);ctx.closePath();ctx.fill()}
+function snowCap(ctx,pts,depth,col,rng){ctx.save();ctx.beginPath();ctx.moveTo(pts[0][0],H);pts.forEach(([x,y])=>ctx.lineTo(x,y));ctx.lineTo(pts[pts.length-1][0],H);ctx.closePath();ctx.clip();
+  const minY=Math.min(...pts.map(p=>p[1]));ctx.fillStyle=col;ctx.beginPath();pts.forEach(([x,y],i)=>{i?ctx.lineTo(x,y-4):ctx.moveTo(x,y-4)});
+  for(let i=pts.length-1;i>=0;i--){const[x,y]=pts[i];const sn=Math.max(0,(depth-(y-minY)*0.9));ctx.lineTo(x,y+sn*(0.6+rng()*0.8))}ctx.closePath();ctx.fill();ctx.restore()}
+function smoothHill(ctx,rng,base,amp,fill,freq=1){const ph=[rng()*9,rng()*9,rng()*9];ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(0,H);
+  for(let x=0;x<=W;x+=12){const y=base+Math.sin(x/W*Math.PI*1.3*freq+ph[0])*amp+Math.sin(x/W*Math.PI*3.1*freq+ph[1])*amp*.35+Math.sin(x/W*Math.PI*7*freq+ph[2])*amp*.08;ctx.lineTo(x,y)}ctx.lineTo(W,H);ctx.closePath();ctx.fill();
+  return x=>base+Math.sin(x/W*Math.PI*1.3*freq+ph[0])*amp+Math.sin(x/W*Math.PI*3.1*freq+ph[1])*amp*.35+Math.sin(x/W*Math.PI*7*freq+ph[2])*amp*.08}
+function cloudSea(ctx,rng,top,tint,shade){for(let layer=0;layer<5;layer++){const y0=top+layer*((H-top)/5);const n=26+layer*6;
+  for(let i=0;i<n;i++){const x=rng()*(W+200)-100,y=y0+rng()*((H-top)/4),rx=60+layer*38+rng()*80,ry=rx*.38;
+    const g=ctx.createRadialGradient(x,y-ry*.3,0,x,y,rx);g.addColorStop(0,rgba(tint,.55));g.addColorStop(.6,rgba(mix(tint,shade,.5),.35));g.addColorStop(1,rgba(shade,0));
+    ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}}}
+function cloudsSky(ctx,rng,n,y0,y1,col,a=.35){for(let i=0;i<n;i++){const x=rng()*W,y=lerp(y0,y1,rng()),rx=120+rng()*260,ry=8+rng()*18;
+  const g=ctx.createRadialGradient(x,y,0,x,y,rx);g.addColorStop(0,rgba(col,a));g.addColorStop(1,rgba(col,0));ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}}
+function waterShimmer(ctx,rng,x,y0,y1,col,width=160){ctx.save();ctx.globalCompositeOperation='lighter';for(let y=y0;y<y1;y+=4+rng()*5){const t=(y-y0)/(y1-y0),w=width*(0.3+t*1.4)*(0.4+rng());
+  ctx.fillStyle=rgba(col,(1-t)*.55+.08);ctx.fillRect(x-w/2+(rng()-.5)*w*.4,y,w,1.5+t*2.5)}ctx.restore()}
+function pine(ctx,x,y,h,col,snow){const w=h*.36;ctx.fillStyle=col;ctx.beginPath();const tiers=5;
+  for(let i=0;i<tiers;i++){const ty=y-h+(i*h/tiers)*.95,bw=w*(0.35+i/tiers*.75);ctx.moveTo(x,ty);ctx.lineTo(x+bw,ty+h/tiers*1.4);ctx.lineTo(x-bw,ty+h/tiers*1.4);ctx.closePath()}
+  ctx.fill();ctx.fillRect(x-h*.03,y-h*.06,h*.06,h*.08);
+  if(snow){ctx.fillStyle=snow;for(let i=0;i<tiers;i++){const ty=y-h+(i*h/tiers)*.95,bw=w*(0.35+i/tiers*.75);ctx.beginPath();ctx.moveTo(x,ty);ctx.lineTo(x+bw*.45,ty+h/tiers*.6);ctx.lineTo(x-bw*.45,ty+h/tiers*.6);ctx.closePath();ctx.fill()}}}
+function palm(ctx,x,y,h,lean,col,rng){ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineCap='round';const tx=x+lean*h,ty=y-h;
+  for(let k=0;k<3;k++){ctx.lineWidth=h*(0.05-k*0.012);ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+lean*h*.15,y-h*.55,tx,ty);ctx.stroke()}
+  const n=9;for(let i=0;i<n;i++){const dir=(i/(n-1))*2-1, l=h*(0.34+rng()*.1), ex=tx+dir*l, ey=ty-l*.25+Math.abs(dir)*l*.75+ (1-Math.abs(dir))*-l*.35;
+    const cx=tx+dir*l*.55, cy=ty-l*.45-(1-Math.abs(dir))*l*.2;const wdt=l*.09;
+    ctx.beginPath();ctx.moveTo(tx,ty);ctx.quadraticCurveTo(cx,cy-wdt,ex,ey);ctx.quadraticCurveTo(cx,cy+wdt,tx,ty+4);ctx.fill();
+    ctx.lineWidth=2;for(let j=1;j<12;j++){const t=j/12,px=(1-t)*(1-t)*tx+2*(1-t)*t*cx+t*t*ex,py=(1-t)*(1-t)*ty+2*(1-t)*t*cy+t*t*ey;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+dir*8-4,py+l*.12*(1-t*.5));ctx.stroke()}}
+  ctx.beginPath();ctx.arc(tx,ty+6,h*.03,0,Math.PI*2);ctx.fill()}
+function roundTree(ctx,x,y,h,col,rng){ctx.fillStyle=col;ctx.fillRect(x-h*.035,y-h*.5,h*.07,h*.5);
+  for(let i=0;i<14;i++){const a=rng()*Math.PI*2,d=rng()*h*.3;ctx.beginPath();ctx.arc(x+Math.cos(a)*d*1.3,y-h*.68+Math.sin(a)*d*.8,h*(0.14+rng()*.1),0,Math.PI*2);ctx.fill()}
+  ctx.lineWidth=h*.025;ctx.strokeStyle=col;[[-1,.45],[1,.5]].forEach(([s,t])=>{ctx.beginPath();ctx.moveTo(x,y-h*t);ctx.lineTo(x+s*h*.2,y-h*(t+.18));ctx.stroke()})}
+function lotus(ctx,x,y,s,petal='#f29bb7',deep='#d4547e'){ctx.save();ctx.translate(x,y);
+  [[-1.1,.8],[1.1,.8],[-.6,.95],[.6,.95],[0,1.05]].forEach(([a,l])=>{ctx.save();ctx.rotate(a*.55);const g=ctx.createLinearGradient(0,0,0,-s*l);g.addColorStop(0,deep);g.addColorStop(1,petal);ctx.fillStyle=g;
+    ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(s*.42,-s*l*.55,0,-s*l);ctx.quadraticCurveTo(-s*.42,-s*l*.55,0,0);ctx.fill();ctx.restore()});ctx.restore()}
+function lilyPad(ctx,x,y,r,col){ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x,y,r,r*.32,0,0.15,Math.PI*2-0.15);ctx.lineTo(x,y);ctx.closePath();ctx.fill()}
+function diya(ctx,x,y,s,rng){ctx.save();ctx.globalCompositeOperation='lighter';glow(ctx,x,y-s*.9,s*3.2,'#ffb347',.45);ctx.restore();
+  const g=ctx.createLinearGradient(0,y-s*.3,0,y+s*.5);g.addColorStop(0,'#e0823c');g.addColorStop(1,'#7a2e14');ctx.fillStyle=g;
+  ctx.beginPath();ctx.moveTo(x-s,y-s*.15);ctx.quadraticCurveTo(x,y+s*.75,x+s,y-s*.15);ctx.quadraticCurveTo(x+s*1.12,y-s*.3,x+s*.9,y-s*.28);ctx.lineTo(x-s*.9,y-s*.28);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#f5c26b';ctx.beginPath();ctx.ellipse(x,y-s*.22,s*.9,s*.12,0,0,Math.PI*2);ctx.fill();
+  const f=ctx.createRadialGradient(x,y-s*.6,0,x,y-s*.7,s*.6);f.addColorStop(0,'#fffbe0');f.addColorStop(.5,'#ffd24a');f.addColorStop(1,'rgba(255,120,20,0)');
+  ctx.fillStyle=f;ctx.beginPath();ctx.moveTo(x,y-s*1.25);ctx.quadraticCurveTo(x+s*.3,y-s*.55,x,y-s*.3);ctx.quadraticCurveTo(x-s*.3,y-s*.55,x,y-s*1.25);ctx.fill()}
+function marigoldToran(ctx,rng,y,sag,cols=['#ff9f1c','#ffbf1f','#f26b1d']){const n=46;
+  const pt=t=>[t*W,y+Math.sin(t*Math.PI)*sag];
+  for(let i=0;i<=n;i++){const[x,yy]=pt(i/n);flower(ctx,x,yy,17,cols[i%cols.length],rng)}
+  // hanging strands with mango leaves
+  for(let k=1;k<8;k++){const t=k/8,[x,yy]=pt(t);const len=40+rng()*50;for(let j=1;j<5;j++)flower(ctx,x,yy+j*16,10,cols[(k+j)%cols.length],rng);leaf(ctx,x,yy+len+50,'#2f7d32')}}
+function flower(ctx,x,y,r,col,rng){ctx.fillStyle=mix(col,'#7a2e00',.35);ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=col;for(let i=0;i<9;i++){const a=rng()*Math.PI*2,d=rng()*r*.55;ctx.beginPath();ctx.arc(x+Math.cos(a)*d,y+Math.sin(a)*d,r*.45,0,Math.PI*2);ctx.fill()}
+  ctx.fillStyle=rgba('#ffffff',.25);ctx.beginPath();ctx.arc(x-r*.3,y-r*.3,r*.3,0,Math.PI*2);ctx.fill()}
+function leaf(ctx,x,y,col,s=26,rot=0){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(0,-s);ctx.quadraticCurveTo(s*.5,0,0,s);ctx.quadraticCurveTo(-s*.5,0,0,-s);ctx.fill();ctx.strokeStyle=rgba('#ffffff',.25);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,-s);ctx.lineTo(0,s);ctx.stroke();ctx.restore()}
+function mangoToran(ctx,rng,y){ctx.strokeStyle='#6b4a1a';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+  for(let i=0;i<24;i++){const x=20+i*(W-40)/23;leaf(ctx,x,y+36,i%2?'#2e7d32':'#43a047',34,(rng()-.5)*.25);if(i%3===0)flower(ctx,x+22,y+6,12,'#ffb300',rng)}}
+function mandala(ctx,x,y,R,col,a=.35){ctx.save();ctx.translate(x,y);ctx.strokeStyle=rgba(col,a);ctx.fillStyle=rgba(col,a*.35);
+  [1,.78,.56,.36].forEach((k,ri)=>{const n=[32,24,16,12][ri];for(let i=0;i<n;i++){ctx.save();ctx.rotate(i/n*Math.PI*2);ctx.beginPath();ctx.moveTo(0,-R*k*.62);
+    ctx.quadraticCurveTo(R*k*.12,-R*k*.82,0,-R*k);ctx.quadraticCurveTo(-R*k*.12,-R*k*.82,0,-R*k*.62);ctx.lineWidth=2;ctx.fill();ctx.stroke();ctx.restore()}
+    ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,R*k*.6,0,Math.PI*2);ctx.stroke()});ctx.restore()}
+function firework(ctx,rng,x,y,r,col){ctx.save();ctx.globalCompositeOperation='lighter';glow(ctx,x,y,r*.9,col,.25);const n=46;
+  for(let i=0;i<n;i++){const a=i/n*Math.PI*2+rng()*.05,l=r*(0.7+rng()*.3);for(let k=0;k<7;k++){const t=(k+1)/7;ctx.fillStyle=rgba(k>4?'#ffffff':col,.9*(1-t*.5));
+    ctx.beginPath();ctx.arc(x+Math.cos(a)*l*t,y+Math.sin(a)*l*t+t*t*r*.12,1.2+ (1-t)*1.8,0,Math.PI*2);ctx.fill()}}ctx.restore()}
+function bokeh(ctx,rng,n,cols,y0=0,y1=H,rmax=40){ctx.save();ctx.globalCompositeOperation='lighter';for(let i=0;i<n;i++){const r=6+rng()*rmax;glow(ctx,rng()*W,lerp(y0,y1,rng()),r,cols[i%cols.length],.25+rng()*.3)}ctx.restore()}
+function stringLights(ctx,rng,y,sag,cols){ctx.strokeStyle='rgba(40,20,10,.7)';ctx.lineWidth=2;ctx.beginPath();for(let x=0;x<=W;x+=10)ctx.lineTo(x,y+Math.sin(x/W*Math.PI)*sag);ctx.stroke();
+  for(let i=0;i<30;i++){const x=18+i*(W-36)/29,yy=y+Math.sin(x/W*Math.PI)*sag+8,c=cols[i%cols.length];ctx.save();ctx.globalCompositeOperation='lighter';glow(ctx,x,yy,26,c,.55);ctx.restore();ctx.fillStyle=mix(c,'#ffffff',.5);ctx.beginPath();ctx.ellipse(x,yy,5,8,0,0,Math.PI*2);ctx.fill()}}
+function kite(ctx,x,y,s,col,col2,rot,rng){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(0,-s);ctx.lineTo(s*.8,0);ctx.lineTo(0,s*1.1);ctx.lineTo(-s*.8,0);ctx.closePath();ctx.fill();
+  ctx.fillStyle=col2;ctx.beginPath();ctx.moveTo(0,-s);ctx.lineTo(s*.8,0);ctx.lineTo(0,0);ctx.closePath();ctx.fill();ctx.strokeStyle=rgba('#3b2a1a',.6);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,-s);ctx.lineTo(0,s*1.1);ctx.moveTo(-s*.8,0);ctx.lineTo(s*.8,0);ctx.stroke();
+  ctx.fillStyle=col2;ctx.beginPath();ctx.moveTo(0,s*1.1);ctx.lineTo(s*.25,s*1.45);ctx.lineTo(-s*.25,s*1.45);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=rgba('#ffffff',.55);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,s*1.1);ctx.bezierCurveTo(s*.4,s*3,-s*1.2,s*5,s*.6+rng()*s,s*9);ctx.stroke();ctx.restore()}
+function lantern(ctx,x,y,s,col){ctx.strokeStyle=rgba('#e8c07a',.8);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,y-s*1.2);ctx.stroke();
+  ctx.save();ctx.globalCompositeOperation='lighter';glow(ctx,x,y,s*3,col,.5);ctx.restore();
+  ctx.fillStyle='#c9973f';ctx.beginPath();ctx.moveTo(x-s*.35,y-s*1.2);ctx.lineTo(x+s*.35,y-s*1.2);ctx.lineTo(x+s*.6,y-s*.8);ctx.lineTo(x-s*.6,y-s*.8);ctx.closePath();ctx.fill();
+  const g=ctx.createLinearGradient(x-s*.6,0,x+s*.6,0);g.addColorStop(0,mix(col,'#5a3a10',.4));g.addColorStop(.5,mix(col,'#fffbe0',.6));g.addColorStop(1,mix(col,'#5a3a10',.4));
+  ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(x-s*.6,y-s*.8);ctx.quadraticCurveTo(x-s*.85,y,x-s*.5,y+s*.7);ctx.lineTo(x+s*.5,y+s*.7);ctx.quadraticCurveTo(x+s*.85,y,x+s*.6,y-s*.8);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#8a6424';ctx.lineWidth=2;for(let k=-1;k<=1;k++){ctx.beginPath();ctx.moveTo(x+k*s*.3,y-s*.8);ctx.quadraticCurveTo(x+k*s*.45,y,x+k*s*.25,y+s*.7);ctx.stroke()}
+  ctx.fillStyle='#c9973f';ctx.beginPath();ctx.moveTo(x-s*.5,y+s*.7);ctx.lineTo(x+s*.5,y+s*.7);ctx.lineTo(x,y+s*1.15);ctx.closePath();ctx.fill()}
+function domes(ctx,base,col){ctx.fillStyle=col;ctx.fillRect(0,base,W,H-base);
+  const dome=(x,w,h)=>{ctx.beginPath();ctx.moveTo(x-w/2,base);ctx.bezierCurveTo(x-w/2,base-h*.7,x-w*.1,base-h*.85,x,base-h);ctx.bezierCurveTo(x+w*.1,base-h*.85,x+w/2,base-h*.7,x+w/2,base);ctx.fill();ctx.fillRect(x-2,base-h-30,4,30)};
+  const minaret=(x,h)=>{ctx.fillRect(x-12,base-h,24,h);ctx.beginPath();ctx.moveTo(x-16,base-h);ctx.lineTo(x,base-h-40);ctx.lineTo(x+16,base-h);ctx.fill()};
+  ctx.fillRect(300,base-90,480,90);dome(540,280,260);dome(380,130,150);dome(700,130,150);minaret(240,300);minaret(840,300);minaret(80,180);minaret(1000,180)}
+function peacockFeather(ctx,x,y,len,rot){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.strokeStyle='#8fbf5a';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(len*.1,-len*.5,0,-len);ctx.stroke();
+  for(let i=0;i<60;i++){const t=i/60,py=-len*t*.95,side=i%2?1:-1,w=len*.22*Math.sin(t*Math.PI*.9+.2);ctx.strokeStyle=rgba(i%3?'#6fae3c':'#2f8f86',.55);ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(0,py);ctx.quadraticCurveTo(side*w*.6,py-8,side*w,py-18);ctx.stroke()}
+  const ey=-len*.82;[[.2,.14,'#2f8f86'],[.13,.1,'#c7a93a'],[.09,.07,'#1a6b8c'],[.05,.045,'#101a4a']].forEach(([rx,ry,c])=>{ctx.fillStyle=c;ctx.beginPath();ctx.ellipse(0,ey,len*rx,len*ry*1.3,0,0,Math.PI*2);ctx.fill()});ctx.restore()}
+function pookalam(ctx,x,y,R,rng){const rings=[['#b71c1c',48],['#ff6f00',40],['#ffc107',32],['#fafafa',24],['#7b1fa2',18],['#e65100',12],['#ffd54f',8]];
+  rings.forEach(([c,n],i)=>{const r=R*(1-i/rings.length);ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=mix(c,rings[(i+1)%rings.length][0],.6);for(let k=0;k<n;k++){const a=k/n*Math.PI*2;ctx.save();ctx.translate(x+Math.cos(a)*r*.92,y+Math.sin(a)*r*.92);ctx.rotate(a+Math.PI/2);ctx.beginPath();ctx.moveTo(0,-R*.03);ctx.quadraticCurveTo(R*.035,R*.03,0,R*.06);ctx.quadraticCurveTo(-R*.035,R*.03,0,-R*.03);ctx.fill();ctx.restore()}});
+  for(let i=0;i<600;i++){const a=rng()*Math.PI*2,d=Math.sqrt(rng())*R;ctx.fillStyle=rgba('#ffffff',.08);ctx.fillRect(x+Math.cos(a)*d,y+Math.sin(a)*d,2,2)}}
+function rakhi(ctx,x,y,s,rng){ctx.strokeStyle='#d62d5b';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(-20,y+40);ctx.quadraticCurveTo(x,y-30,W+20,y+40);ctx.stroke();ctx.strokeStyle='#f6c945';ctx.lineWidth=2;ctx.setLineDash([6,6]);ctx.stroke();ctx.setLineDash([]);
+  const cols=['#e53970','#f6c945','#ff8a3d','#e53970'];for(let r=0;r<4;r++){const rr=s*(1-r*.22),n=18-r*3;for(let i=0;i<n;i++){const a=i/n*Math.PI*2;ctx.fillStyle=cols[r];ctx.beginPath();ctx.ellipse(x+Math.cos(a)*rr*.72,y+Math.sin(a)*rr*.72,rr*.26,rr*.12,a,0,Math.PI*2);ctx.fill()}}
+  ctx.fillStyle='#fff3c4';ctx.beginPath();ctx.arc(x,y,s*.2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#d4af37';ctx.beginPath();ctx.arc(x,y,s*.12,0,Math.PI*2);ctx.fill();
+  for(let i=0;i<14;i++){const a=i/14*Math.PI*2;ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(x+Math.cos(a)*s*.95,y+Math.sin(a)*s*.95,4,0,Math.PI*2);ctx.fill()}}
+function wheat(ctx,rng,base,n,col){for(let i=0;i<n;i++){const x=rng()*W,h=80+rng()*160,y=base+rng()*(H-base),lean=(rng()-.5)*.25;ctx.strokeStyle=rgba(col,.8);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+lean*h*.5,y-h*.5,x+lean*h,y-h);ctx.stroke();
+  ctx.fillStyle=col;for(let k=0;k<8;k++){const t=1-k*.045,px=x+lean*h*t,py=y-h*t;ctx.beginPath();ctx.ellipse(px-4,py,3,7,-.5,0,Math.PI*2);ctx.ellipse(px+4,py,3,7,.5,0,Math.PI*2);ctx.fill()}}}
+function flowerField(ctx,rng,top,cols,density=2600){for(let i=0;i<density;i++){const t=Math.pow(rng(),1.6),y=top+t*(H-top),s=1+t*9,x=rng()*W;ctx.fillStyle=rgba(cols[(rng()*cols.length)|0],.6+t*.4);ctx.beginPath();ctx.ellipse(x,y,s,s*.8,0,0,Math.PI*2);ctx.fill()}}
+function powder(ctx,rng,x,y,r,col){for(let i=0;i<30;i++){const a=rng()*Math.PI*2,d=rng()*r*.7,rr=r*(0.25+rng()*.45);glow(ctx,x+Math.cos(a)*d,y+Math.sin(a)*d*.8,rr,col,.18+rng()*.15)}
+  for(let i=0;i<140;i++){const a=rng()*Math.PI*2,d=r*(0.4+rng()*.9);ctx.fillStyle=rgba(col,.5+rng()*.4);ctx.beginPath();ctx.arc(x+Math.cos(a)*d,y+Math.sin(a)*d,1+rng()*3.5,0,Math.PI*2);ctx.fill()}}
+function snowfall(ctx,rng,n){for(let i=0;i<n;i++){ctx.fillStyle=rgba('#ffffff',.4+rng()*.5);ctx.beginPath();ctx.arc(rng()*W,rng()*H,1+rng()*3.2,0,Math.PI*2);ctx.fill()}}
+function star5(ctx,x,y,r,col){ctx.fillStyle=col;ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.42:r;ctx.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr)}ctx.closePath();ctx.fill()}
+function skyline(ctx,rng,base,col){ctx.fillStyle=col;let x=0;while(x<W){const w=40+rng()*70,h=60+rng()*200;ctx.fillRect(x,base-h,w-4,h+H);ctx.fillStyle=rgba('#ffd98a',.5);for(let wy=base-h+12;wy<base-10;wy+=18)for(let wx=x+8;wx<x+w-12;wx+=14)if(rng()<.3)ctx.fillRect(wx,wy,6,8);ctx.fillStyle=col;x+=w}}
+
+/* ---------- palettes for everyday dawns ---------- */
+const DAWNS=[
+ {name:'golden',  sky:[[0,'#2d3a63'],[.35,'#8a6a8e'],[.55,'#f2a65a'],[.7,'#ffd49a']], halo:'#ffc36b', far:'#6f6a8e', near:'#2b2a45'},
+ {name:'rose',    sky:[[0,'#3b3d78'],[.35,'#b0739e'],[.58,'#f7a49a'],[.72,'#ffdcc2']], halo:'#ffb8a0', far:'#8a7aa6', near:'#352c4c'},
+ {name:'clear',   sky:[[0,'#3f7cc4'],[.4,'#86b8e6'],[.62,'#f9e0b2'],[.75,'#fff1d6']], halo:'#fff0c0', far:'#7f9cbf', near:'#2f4666'},
+ {name:'peach',   sky:[[0,'#48407a'],[.3,'#c07a86'],[.55,'#ffb27a'],[.72,'#ffe6b8']], halo:'#ffcf8a', far:'#9a7f8e', near:'#3a2e3e'},
+ {name:'amber',   sky:[[0,'#1f2a4d'],[.35,'#5d4f7a'],[.58,'#e8894a'],[.72,'#ffc27a']], halo:'#ffae55', far:'#5e5578', near:'#221f35'}
+];
+
+/* ---------- everyday scenes ---------- */
+const SCENES = {
+ mountainsAboveClouds:{label:'Peaks above the clouds',draw(ctx,r,p){
+   sky(ctx,p.sky.map(([o,c])=>[o*1.05>1?1:o*1.05,c]),H);cloudsSky(ctx,r,10,280,470,'#ffe2c0',.35);
+   const sx=420+r()*240,sy=430+r()*20;sun(ctx,sx,sy,16,{halo:p.halo,rng:r});
+   const far=peakRidge(r,470,[[sx-260,70,90],[sx+330,50,120]],60);fillRidge(ctx,far,vgrad(ctx,380,600,[[0,mix(p.far,'#ffffff',.25)],[1,p.far]]));
+   const mid=peakRidge(r,540,[[sx-120,150,70],[sx+40,90,60],[150,60,90],[930,80,90]],70);fillRidge(ctx,mid,vgrad(ctx,380,640,[[0,mix(p.near,'#8b7fa3',.6)],[1,p.near]]));snowCap(ctx,mid,60,rgba('#f6efe9',.85),r);
+   const near=peakRidge(r,600,[[900,120,110],[60,70,80]],50);fillRidge(ctx,near,vgrad(ctx,480,700,[[0,mix(p.near,'#bcb0cc',.35)],[1,p.near]]));snowCap(ctx,near,45,rgba('#e8e2ea',.75),r);
+   cloudSea(ctx,r,560,'#f4ecf2',mix(p.near,'#9aa0c0',.5));birds(ctx,r,4,sx+220,340,120,rgba('#1c1830',.7));return{}}},
+ oceanSunrise:{label:'Sunrise over the sea',draw(ctx,r,p){
+   const hz=560;sky(ctx,p.sky,hz);cloudsSky(ctx,r,14,220,500,'#ffd7b0',.45);const sx=380+r()*320;sun(ctx,sx,hz-30-r()*40,22,{halo:p.halo,rng:r});
+   ctx.fillStyle=vgrad(ctx,hz,H,[[0,mix(p.far,'#f3b58a',.4)],[.4,mix(p.near,p.far,.4)],[1,p.near]]);ctx.fillRect(0,hz,W,H-hz);
+   waterShimmer(ctx,r,sx,hz+2,H,p.halo,200);ctx.strokeStyle=rgba('#ffffff',.08);for(let i=0;i<60;i++){const y=hz+Math.pow(r(),1.5)*(H-hz),x=r()*W,w=20+r()*90;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.stroke()}
+   birds(ctx,r,5,sx-200,300,160,rgba('#20182b',.75));return{}}},
+ mistyHills:{label:'Misty Western Ghats',draw(ctx,r,p){
+   sky(ctx,p.sky,H*.8);const sx=250+r()*580;sun(ctx,sx,380,20,{halo:p.halo,rng:r,rays:false});
+   const layers=6;for(let i=0;i<layers;i++){const t=i/(layers-1);const col=mix(mix(p.far,'#9fb8a2',.35),'#16301f',t*.9);smoothHill(ctx,r,420+i*85,40+i*6,col,1+i*.2);
+     const m=ctx.createLinearGradient(0,420+i*85-40,0,420+i*85+120);m.addColorStop(0,rgba('#f5eadf',0));m.addColorStop(1,rgba('#f5eadf',.28*(1-t)));ctx.fillStyle=m;ctx.fillRect(0,420+i*85-40,W,200)}
+   birds(ctx,r,6,sx+120,300,200,rgba('#1c2419',.7));return{}}},
+ lotusPond:{label:'Lotus pond at dawn',draw(ctx,r,p){
+   const hz=470;sky(ctx,p.sky,hz);const sx=300+r()*480;sun(ctx,sx,hz-50,18,{halo:p.halo,rng:r});smoothHill(ctx,r,hz-15,12,mix(p.far,'#3c5a45',.5));
+   ctx.fillStyle=vgrad(ctx,hz,H,[[0,mix(p.far,'#f4c8a0',.35)],[1,'#1c3140']]);ctx.fillRect(0,hz,W,H-hz);waterShimmer(ctx,r,sx,hz,H*.8,p.halo,140);
+   const pads=[];for(let i=0;i<40;i++){const t=Math.pow(r(),.8),y=hz+30+t*(H-hz-30),s=14+t*70;pads.push([r()*W,y,s])}pads.sort((a,b)=>a[1]-b[1]);
+   pads.forEach(([x,y,s],i)=>{lilyPad(ctx,x,y,s,mix('#2f6b3a','#6fa05a',r()*.6));if(i%4===1)lotus(ctx,x,y-s*.1,s*.7)});return{quoteY:640}}},
+ dunes:{label:'Desert dunes',draw(ctx,r,p){
+   const pal=DAWNS[3];sky(ctx,pal.sky,H*.75);const sx=300+r()*480;sun(ctx,sx,470,24,{halo:'#ffc070',rng:r});
+   const cols=['#d99a63','#c47b45','#a95f33','#7d4125','#5a2c1a'];for(let i=0;i<5;i++){const base=520+i*105;
+     ctx.fillStyle=vgrad(ctx,base-80,base+160,[[0,mix(cols[i],'#ffd9a8',.35)],[1,cols[i]]]);ctx.beginPath();ctx.moveTo(0,H);const ph=r()*6,a=40+r()*40;
+     for(let x=0;x<=W;x+=10){ctx.lineTo(x,base+Math.sin(x/W*Math.PI*(1+i*.3)+ph)*a+Math.sin(x/170+ph)*10)}ctx.lineTo(W,H);ctx.closePath();ctx.fill()}
+   birds(ctx,r,3,sx+160,360,100,rgba('#3a2012',.7));return{}}},
+ teaGarden:{label:'Tea garden hills',draw(ctx,r,p){
+   sky(ctx,DAWNS[2].sky,H*.7);const sx=620+r()*260;sun(ctx,sx,330,20,{halo:'#fff0c0',rng:r});cloudsSky(ctx,r,10,200,380,'#ffffff',.45);
+   const cols=['#8fb78a','#5f9a55','#3e7d3a','#2a5e2a','#1b4220'];for(let i=0;i<5;i++){const base=430+i*120;const f=smoothHill(ctx,r,base,45+i*12,cols[i],.8+i*.25);
+     ctx.strokeStyle=rgba('#0f2a12',.28);ctx.lineWidth=2+i;for(let row=1;row<8;row++){ctx.beginPath();for(let x=0;x<=W;x+=14){const y=f(x)+row*(14+i*6);x?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke()}}
+   const m=ctx.createLinearGradient(0,380,0,700);m.addColorStop(0,rgba('#ffffff',.35));m.addColorStop(1,rgba('#ffffff',0));ctx.fillStyle=m;ctx.fillRect(0,380,W,320);
+   roundTree(ctx,180,560,130,'#1f3e20',r);roundTree(ctx,860,610,110,'#1f3e20',r);return{}}},
+ flowerMeadow:{label:'Flower meadow',draw(ctx,r,p){
+   sky(ctx,p.sky,H*.7);const sx=250+r()*580;sun(ctx,sx,420,20,{halo:p.halo,rng:r});smoothHill(ctx,r,500,26,mix(p.far,'#4f6a58',.5));
+   ctx.fillStyle=vgrad(ctx,520,H,[[0,'#6c8a4f'],[1,'#233b1d']]);ctx.fillRect(0,520,W,H-520);
+   const sets=[['#9a7fd1','#b79ae6','#7c5fb8','#d8c8f5'],['#f2c14e','#f7d774','#e89c3a','#ffffff'],['#f06a8a','#ffa3b5','#ffffff','#f7d774']];
+   flowerField(ctx,r,520,sets[(r()*sets.length)|0]);return{}}},
+ lakeReflection:{label:'Mountain lake',draw(ctx,r,p){
+   const hz=560;sky(ctx,p.sky,hz);cloudsSky(ctx,r,8,200,420,'#ffe0cc',.35);const sx=380+r()*320;sun(ctx,sx,470,16,{halo:p.halo,rng:r});
+   const m=peakRidge(r,520,[[sx-160,190,90],[sx+170,130,80],[80,90,90],[1000,110,100]],60);fillRidge(ctx,m,vgrad(ctx,300,hz,[[0,mix(p.far,'#ffffff',.2)],[1,p.near]]),hz);snowCap(ctx,m,55,rgba('#f7f0ee',.85),r);
+   const pines=[];for(let i=0;i<40;i++)pines.push([r()*W,hz+2,30+r()*50]);pines.forEach(([x,y,h])=>pine(ctx,x,y,h,mix(p.near,'#0f1a14',.6)));
+   ctx.save();ctx.translate(0,hz*2);ctx.scale(1,-1);ctx.globalAlpha=.45;fillRidge(ctx,m,vgrad(ctx,300,hz,[[0,mix(p.far,'#ffffff',.2)],[1,p.near]]),hz);ctx.restore();
+   ctx.fillStyle=vgrad(ctx,hz,H,[[0,rgba(mix(p.far,'#f6c9a6',.3),.55)],[1,rgba('#1a2238',.95)]]);ctx.fillRect(0,hz,W,H-hz);waterShimmer(ctx,r,sx,hz,H,p.halo,120);return{}}},
+ palmBeach:{label:'Konkan coast palms',draw(ctx,r,p){
+   const hz=600;sky(ctx,p.sky,hz);cloudsSky(ctx,r,12,200,540,'#ffd9bb',.45);const sx=560+r()*200;sun(ctx,sx,hz-40,24,{halo:p.halo,rng:r});
+   ctx.fillStyle=vgrad(ctx,hz,860,[[0,mix(p.far,'#f5b88a',.4)],[1,p.near]]);ctx.fillRect(0,hz,W,260);waterShimmer(ctx,r,sx,hz,860,p.halo,160);
+   ctx.fillStyle=vgrad(ctx,840,H,[[0,'#3a2a2a'],[1,'#1d1418']]);ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(0,860);ctx.quadraticCurveTo(540,820,W,880);ctx.lineTo(W,H);ctx.fill();
+   ctx.fillStyle=rgba('#ffffff',.25);ctx.beginPath();ctx.moveTo(0,862);ctx.quadraticCurveTo(540,822,W,882);ctx.lineTo(W,888);ctx.quadraticCurveTo(540,830,0,870);ctx.fill();
+   palm(ctx,90,H,560,.18,'#1a1216',r);palm(ctx,200,H,420,.3,'#1a1216',r);palm(ctx,990,H,500,-.2,'#1a1216',r);birds(ctx,r,5,sx-80,320,160,rgba('#20182b',.7));return{}}},
+ loneTree:{label:'Banyan on the hill',draw(ctx,r,p){
+   sky(ctx,p.sky,H);cloudsSky(ctx,r,14,160,520,'#ffe0c2',.4);const sx=600+r()*200;sun(ctx,sx,560,26,{halo:p.halo,rng:r});
+   smoothHill(ctx,r,640,20,mix(p.far,p.near,.5));const f=smoothHill(ctx,r,740,50,p.near,.6);const tx=260+r()*120;
+   ctx.fillStyle=p.near;const gy=f(tx);ctx.beginPath();ctx.moveTo(tx-26,gy+6);ctx.quadraticCurveTo(tx-8,gy-120,tx-14,gy-200);ctx.lineTo(tx+14,gy-200);ctx.quadraticCurveTo(tx+8,gy-120,tx+30,gy+6);ctx.fill();
+   ctx.strokeStyle=p.near;ctx.lineCap='round';[[-1,.9],[1,.8],[-.5,1.1],[.6,1.05]].forEach(([dx,k])=>{ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(tx,gy-170);ctx.quadraticCurveTo(tx+dx*80,gy-200*k,tx+dx*190,gy-250*k);ctx.stroke()});
+   for(let i=0;i<120;i++){const u=r()*2-1,v=r();const x=tx+u*260,y=gy-250-v*110*(1-u*u*.6)+u*u*40;ctx.beginPath();ctx.arc(x,y,14+r()*24,0,Math.PI*2);ctx.fill()}
+   ctx.lineWidth=1.5;for(let i=0;i<14;i++){const x=tx-220+r()*440;ctx.beginPath();ctx.moveTo(x,gy-230);ctx.lineTo(x+(r()-.5)*6,gy-130+r()*60);ctx.stroke()}birds(ctx,r,7,sx-60,380,240,rgba('#20182b',.7));return{}}}
+};
+
+/* ---------- festival scenes ---------- */
+const FEST_SCENES = {
+ diwali(ctx,r){sky(ctx,[[0,'#0b0a24'],[.55,'#2a0f3a'],[1,'#5a1a1a']]);stars(ctx,r,120,500);
+   firework(ctx,r,190,300,150,'#ffcc4d');firework(ctx,r,900,240,120,'#ff6fae');firework(ctx,r,760,470,90,'#7fd1ff');
+   bokeh(ctx,r,40,['#ffb347','#ffd27a','#ff7f50'],560,1000,34);stringLights(ctx,r,400,60,['#ffd27a','#ff8a5b','#fff0b0','#ff6fae']);
+   const n=7;for(let i=0;i<n;i++)diya(ctx,100+i*(W-200)/(n-1),880+Math.abs(i-3)*12,44,r);return{quoteY:640}},
+ navratri(ctx,r){sky(ctx,[[0,'#3a0610'],[.5,'#8a1a1a'],[1,'#d1541e']]);mandala(ctx,540,620,520,'#ffd27a',.28);mandala(ctx,540,620,300,'#ffe7b0',.22);
+   bokeh(ctx,r,30,['#ffcf6b','#ff8a3d'],400,1080,30);marigoldToran(ctx,r,-4,60);for(let i=0;i<5;i++)diya(ctx,160+i*190,915,40,r);return{}},
+ dussehra(ctx,r){sky(ctx,[[0,'#1a0b2e'],[.5,'#6b1e3a'],[1,'#e0762e']]);stars(ctx,r,60,400);
+   firework(ctx,r,200,380,130,'#ffcc4d');firework(ctx,r,880,330,150,'#ff8a3d');firework(ctx,r,560,520,100,'#ffe9a8');
+   marigoldToran(ctx,r,-4,50);ctx.fillStyle='#1a0c14';ctx.beginPath();ctx.moveTo(0,H);for(let x=0;x<=W;x+=20)ctx.lineTo(x,930+Math.sin(x/90)*12);ctx.lineTo(W,H);ctx.fill();return{}},
+ holi(ctx,r){sky(ctx,[[0,'#fff1dc'],[1,'#ffd9ea']]);const cols=['#ff1f6b','#ffc400','#00b894','#6c3cff','#ff6a00','#0091ff'];
+   [[160,420,260],[900,380,280],[540,860,320],[120,900,240],[980,880,260],[560,300,220]].forEach(([x,y,s],i)=>powder(ctx,r,x,y,s,cols[i%cols.length]));
+   ctx.fillStyle=rgba('#1b1030',.1);ctx.fillRect(0,0,W,H);return{}},
+ ganesh(ctx,r){sky(ctx,[[0,'#4a0e0e'],[.5,'#b23a1a'],[1,'#f2a33a']]);ctx.save();ctx.globalCompositeOperation='lighter';glow(ctx,540,620,520,'#ffd27a',.45);ctx.restore();
+   mandala(ctx,540,620,420,'#fff0c0',.3);marigoldToran(ctx,r,-4,70);
+   [[30,1],[W-30,-1]].forEach(([x])=>{for(let j=0;j<22;j++)flower(ctx,x,120+j*40,17,j%2?'#ffbf1f':'#ff7a1a',r)});for(let i=0;i<5;i++)diya(ctx,200+i*170,920,42,r);return{}},
+ sankranti(ctx,r){sky(ctx,[[0,'#2f7fd8'],[.6,'#8cc6f2'],[1,'#fbe7b5']]);sun(ctx,860,420,26,{halo:'#fff2b0',rng:r});cloudsSky(ctx,r,10,300,600,'#ffffff',.5);
+   const kc=[['#ff3d7f','#ffd23f'],['#1fa2ff','#ffffff'],['#ff8a3d','#7b5cff'],['#3bceac','#ffd23f'],['#e53935','#fff176'],['#8e24aa','#ffb300']];
+   [[160,420,48],[300,560,34],[780,560,40],[930,640,28],[480,440,26],[640,380,30]].forEach(([x,y,s],i)=>kite(ctx,x,y,s,kc[i][0],kc[i][1],(r()-.5)*.6,r));
+   smoothHill(ctx,r,900,18,'#6a8f3a');ctx.strokeStyle='#4f7a2a';ctx.lineWidth=8;for(let i=0;i<14;i++){const x=i<7?20+i*16:W-20-(i-7)*16;ctx.beginPath();ctx.moveTo(x,H);ctx.lineTo(x+(i<7?8:-8),760+r()*60);ctx.stroke()}return{}},
+ national(ctx,r){sky(ctx,[[0,'#fffaf0'],[1,'#f3f6ff']]);
+   const band=(y,col,amp,ph)=>{ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(0,y);for(let x=0;x<=W;x+=10)ctx.lineTo(x,y+Math.sin(x/W*Math.PI*2+ph)*amp);for(let x=W;x>=0;x-=10)ctx.lineTo(x,y+130+Math.sin(x/W*Math.PI*2+ph+.6)*amp);ctx.closePath();ctx.fill()};
+   band(330,rgba('#ff9933',.9),50,0);band(700,rgba('#138808',.9),50,.4);ctx.save();ctx.globalCompositeOperation='lighter';bokeh(ctx,r,24,['#ffd9a8','#c9f2c0'],300,900,26);ctx.restore();
+   ctx.fillStyle=rgba('#0b1a3a',.3);ctx.fillRect(0,0,W,H);return{}},
+ christmas(ctx,r){sky(ctx,[[0,'#07122e'],[.7,'#1b3a6a'],[1,'#3a5a8a']]);stars(ctx,r,160,700);star5(ctx,540,360,34,'#ffe7a0');ctx.save();ctx.globalCompositeOperation='lighter';glow(ctx,540,360,160,'#ffe7a0',.45);ctx.restore();
+   const f=smoothHill(ctx,r,860,30,'#e9f0fa');for(let i=0;i<16;i++){const x=r()*W,h=120+r()*220;pine(ctx,x,f(x)+20,h,'#0e2a22','#e9f0fa')}
+   ctx.fillStyle='#f4f8ff';ctx.fillRect(0,960,W,120);snowfall(ctx,r,260);bokeh(ctx,r,14,['#ff6b6b','#ffd166','#6bd66b'],820,960,16);return{}},
+ newyear(ctx,r){sky(ctx,[[0,'#050818'],[.7,'#1a1a4a'],[1,'#3a2a6a']]);stars(ctx,r,160,700);
+   [[200,320,150,'#ffcc4d'],[860,280,170,'#ff6fae'],[540,480,120,'#7fd1ff'],[330,560,90,'#b7ff7a'],[780,560,100,'#ffd27a']].forEach(([x,y,s,c])=>firework(ctx,r,x,y,s,c));skyline(ctx,r,930,'#0a0a1c');return{}},
+ eid(ctx,r){sky(ctx,[[0,'#06142e'],[.7,'#0f3b52'],[1,'#1f5a5f']]);stars(ctx,r,140,760);moon(ctx,840,460,62,{crescent:true,color:'#fff1c2',bg:'#0a2440'});star5(ctx,750,420,14,'#fff1c2');
+   [[110,470,34,'#ffb347'],[230,560,26,'#ff7f7f'],[1000,600,28,'#ffd27a']].forEach(([x,y,s,c])=>lantern(ctx,x,y,s,c));domes(ctx,960,'#06101f');return{}},
+ onam(ctx,r){sky(ctx,[[0,'#0e3b1f'],[.6,'#2f6b2b'],[1,'#c9a13a']]);for(let i=0;i<9;i++)leaf(ctx,r()*W,r()*420,rgba('#7fbf5a',.35),120,r()*3);
+   pookalam(ctx,540,1150,380,r);for(let i=0;i<4;i++)diya(ctx,[90,210,870,990][i],960,36,r);return{quoteY:600}},
+ rakhi(ctx,r){sky(ctx,[[0,'#6a2c5e'],[.55,'#d9709a'],[1,'#ffd0a8']]);bokeh(ctx,r,40,['#fff0b0','#ffc2d6','#ffd27a'],0,H,36);rakhi(ctx,540,830,110,r);return{quoteY:580}},
+ janmashtami(ctx,r){sky(ctx,[[0,'#050a2a'],[.6,'#10265e'],[1,'#1f4a8a']]);stars(ctx,r,160,800);moon(ctx,820,360,56,{color:'#fff6dc'});
+   peacockFeather(ctx,40,1180,480,.55);peacockFeather(ctx,W-40,1180,480,-.55);mandala(ctx,540,640,380,'#9fc8ff',.16);return{}},
+ ugadi(ctx,r){sky(ctx,DAWNS[0].sky);sun(ctx,540,560,24,{halo:'#ffcf6b',rng:r});smoothHill(ctx,r,760,26,'#5b8a3a');smoothHill(ctx,r,850,30,'#3e6b2a');
+   mangoToran(ctx,r,24);flowerField(ctx,r,860,['#ffd23f','#ff8a3d','#ffffff'],1200);return{}},
+ puja(ctx,r){sky(ctx,[[0,'#5a1810'],[.5,'#c2551e'],[1,'#f8c46a']]);sun(ctx,540,600,34,{halo:'#ffd27a',rng:r});mandala(ctx,540,600,360,'#fff0c0',.3);
+   marigoldToran(ctx,r,-4,50);for(let i=0;i<5;i++)diya(ctx,200+i*170,925,40,r);return{}},
+ vasant(ctx,r){sky(ctx,[[0,'#6fb4ea'],[.6,'#cfe8f7'],[1,'#fff4c8']]);sun(ctx,820,360,24,{halo:'#fff3b0',rng:r});cloudsSky(ctx,r,10,200,500,'#ffffff',.5);
+   ctx.fillStyle=vgrad(ctx,620,H,[[0,'#e8c62a'],[1,'#8a7a10']]);ctx.fillRect(0,620,W,H-620);flowerField(ctx,r,620,['#ffe14a','#ffd000','#fff27a'],3000);
+   kite(ctx,220,380,34,'#ffd000','#ffffff',.3,r);return{}},
+ shivaratri(ctx,r){sky(ctx,[[0,'#030818'],[.7,'#0d1f45'],[1,'#2a3f70']]);stars(ctx,r,220,700);moon(ctx,880,430,46,{crescent:true,color:'#eef4ff',bg:'#06102a'});
+   const m=peakRidge(r,660,[[540,300,120],[200,120,110],[900,150,120]],50);fillRidge(ctx,m,vgrad(ctx,340,800,[[0,'#6a7aa6'],[1,'#141c38']]));snowCap(ctx,m,90,rgba('#dfe8ff',.8),r);
+   cloudSea(ctx,r,760,'#8fa2cc','#1a2448');return{}},
+ easter(ctx,r){sky(ctx,[[0,'#9fd3f0'],[.6,'#f7dff0'],[1,'#fff5d8']]);sun(ctx,540,460,22,{halo:'#fff3c0',rng:r});smoothHill(ctx,r,640,30,'#8ec27a');
+   ctx.fillStyle=vgrad(ctx,660,H,[[0,'#7bb866'],[1,'#3e7a3a']]);ctx.fillRect(0,680,W,H);flowerField(ctx,r,660,['#ffffff','#f8b8d0','#ffe27a','#c7a8f0'],2400);return{}},
+ baisakhi(ctx,r){sky(ctx,DAWNS[4].sky);sun(ctx,560,540,26,{halo:'#ffc070',rng:r});ctx.fillStyle=vgrad(ctx,600,H,[[0,'#d9a441'],[1,'#7a5214']]);ctx.fillRect(0,600,W,H-600);wheat(ctx,r,620,340,'#f2c55c');return{}},
+ buddha(ctx,r){sky(ctx,[[0,'#060d26'],[.6,'#14285a'],[1,'#2d4a7a']],560);stars(ctx,r,150,520);moon(ctx,540,340,80,{color:'#fff8e6'});
+   ctx.fillStyle=vgrad(ctx,560,H,[[0,'#1e3660'],[1,'#07122a']]);ctx.fillRect(0,560,W,H-560);waterShimmer(ctx,r,540,560,H,'#fff2c8',120);
+   [[200,900,90],[880,940,110],[540,1010,70],[380,800,50],[720,800,48]].forEach(([x,y,s])=>{lilyPad(ctx,x-30,y+10,s*1.1,'#244a3a');lotus(ctx,x,y,s,'#fbe6ef','#e38bb0')});return{quoteY:660}},
+ chhath(ctx,r){const hz=560;sky(ctx,DAWNS[0].sky,hz);sun(ctx,540,hz-20,40,{halo:'#ffb347',rng:r});
+   ctx.fillStyle=vgrad(ctx,hz,H,[[0,'#d58a4a'],[1,'#2a1c30']]);ctx.fillRect(0,hz,W,H-hz);waterShimmer(ctx,r,540,hz,H,'#ffb347',220);
+   for(let i=0;i<9;i++){const x=r()*W,y=hz+120+r()*380;diya(ctx,x,y,18+(y-hz)*.05,r)}return{}},
+ gurpurab(ctx,r){sky(ctx,[[0,'#0d0a24'],[.6,'#2a1c4a'],[1,'#6a3a2a']]);bokeh(ctx,r,60,['#ffd27a','#ffb347','#fff0c0'],0,H,40);ctx.save();ctx.globalCompositeOperation='lighter';glow(ctx,540,560,420,'#ffd27a',.3);ctx.restore();
+   for(let row=0;row<2;row++)for(let i=0;i<9;i++)diya(ctx,70+i*117+(row?58:0),880+row*80,28+row*6,r);return{quoteY:620}}
+};
+
+/* ---------- selection ---------- */
+const SWITCH_HOUR = 0;           // new card appears at 12:00 AM (midnight) local time
+const SCENE_KEYS = Object.keys(SCENES);
+const pad = n => String(n).padStart(2,'0');
+const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const fromKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); };
+const dayNum = k => Math.round(Date.UTC(...k.split('-').map((v,i)=>i===1?v-1:+v))/864e5);
+function cardDayKey(now=new Date()){ return keyOf(new Date(now.getTime() - SWITCH_HOUR*3600e3)); }
+function festivalOn(k){
+  for(const f of FESTIVALS){ for(const d of f.dates){
+    if(typeof d==='string' ? d===k : (k>=d[0] && k<=d[1])) return f; } }
+  return null;
+}
+function pickFor(k, qShift=0, sShift=0){
+  const n = dayNum(k), fest = festivalOn(k);
+  const quote = fest && qShift===0 ? fest.wishes[n % fest.wishes.length]
+              : QUOTES[((n*37 + qShift*11) % QUOTES.length + QUOTES.length) % QUOTES.length];
+  // scenes rotate through a shuffled order each 10-day block so neighbours never repeat
+  const sIdx = ((n*3 + sShift) % SCENE_KEYS.length + SCENE_KEYS.length) % SCENE_KEYS.length;
+  const useFest = fest && sShift===0;
+  return { fest, quote, scene: useFest ? null : SCENE_KEYS[sIdx], theme: useFest ? fest.theme : null,
+           dawn: DAWNS[(n + Math.floor(n/10) + sShift) % DAWNS.length], seed: hashStr(k + ':' + sShift) };
+}
+
+/* ---------- text ---------- */
+function wrap(ctx, text, maxW){
+  const words = text.split(/\s+/), lines = []; let line = '';
+  for(const w of words){ const t = line ? line+' '+w : w; if(ctx.measureText(t).width > maxW && line){ lines.push(line); line = w; } else line = t; }
+  if(line) lines.push(line); return lines;
+}
+function drawText(ctx, pick, quoteText, layout){
+  // legibility veils
+  let g = ctx.createLinearGradient(0,0,0,380); g.addColorStop(0,'rgba(10,8,24,.45)'); g.addColorStop(1,'rgba(10,8,24,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,380);
+  g = ctx.createLinearGradient(0,860,0,H); g.addColorStop(0,'rgba(10,8,24,0)'); g.addColorStop(1,'rgba(10,8,24,.5)'); ctx.fillStyle=g; ctx.fillRect(0,860,W,220);
+  const qy = layout.quoteY || 700;
+  const rg = ctx.createRadialGradient(540,qy,40,540,qy,520); rg.addColorStop(0,'rgba(8,6,20,.42)'); rg.addColorStop(1,'rgba(8,6,20,0)');
+  ctx.save(); ctx.translate(540,qy); ctx.scale(1,.42); ctx.translate(-540,-qy); ctx.fillStyle=rg; ctx.fillRect(0,qy-520,W,1040); ctx.restore();
+
+  // Good Morning — static, gold
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.font = '700 128px "Playfair Display", Georgia, serif';
+  const gold = ctx.createLinearGradient(0,110,0,230); gold.addColorStop(0,'#fff4cf'); gold.addColorStop(.45,'#f1cf86'); gold.addColorStop(1,'#c8903f');
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.55)'; ctx.shadowBlur=24; ctx.shadowOffsetY=4; ctx.fillStyle=gold; ctx.fillText('Good Morning',540,215); ctx.restore();
+  ctx.save(); ctx.shadowColor='rgba(255,210,140,.55)'; ctx.shadowBlur=30; ctx.fillStyle=gold; ctx.fillText('Good Morning',540,215); ctx.restore();
+
+  // festival greeting
+  if(pick.fest){
+    ctx.font = 'italic 600 62px "Cormorant Garamond", Georgia, serif';
+    ctx.save(); ctx.shadowColor='rgba(0,0,0,.6)'; ctx.shadowBlur=16; ctx.fillStyle='#fff3dc'; ctx.fillText('~ ' + pick.fest.greet + ' ~', 540, 300); ctx.restore();
+  }
+
+  // quote — auto-fit
+  let size = 56, lines;
+  for(;size>=34;size-=2){ ctx.font = `500 ${size}px "Cormorant Garamond", Georgia, serif`; lines = wrap(ctx, '“'+quoteText+'”', 780); if(lines.length <= 4) break; }
+  const lh = size*1.22, top = qy - (lines.length-1)*lh/2 + size*.33;
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.75)'; ctx.shadowBlur=14; ctx.shadowOffsetY=2; ctx.fillStyle='#ffffff';
+  lines.forEach((l,i)=>ctx.fillText(l,540,top+i*lh)); ctx.restore();
+
+  // signature — static, on a soft dark bed so it reads over busy scenes
+  { const sg=ctx.createRadialGradient(540,985,10,540,985,260); sg.addColorStop(0,'rgba(8,6,20,.45)'); sg.addColorStop(1,'rgba(8,6,20,0)'); ctx.save(); ctx.translate(540,985); ctx.scale(1,.3); ctx.translate(-540,-985); ctx.fillStyle=sg; ctx.fillRect(0,985-260,W,520); ctx.restore(); }
+  if(SIG_IMG.complete && SIG_IMG.naturalWidth){ const sw=330, sh=sw*SIG_IMG.naturalHeight/SIG_IMG.naturalWidth;
+    ctx.save(); ctx.shadowColor='rgba(0,0,0,.6)'; ctx.shadowBlur=12; ctx.drawImage(SIG_IMG, 540-sw/2, 985-sh/2, sw, sh); ctx.restore(); }
+}
+
+/* ---------- render ---------- */
+const SIG_IMG = new Image(); SIG_IMG.src = SIG_SRC;
+const sigReady = new Promise(res => { if(SIG_IMG.complete) res(); SIG_IMG.onload = res; SIG_IMG.onerror = res; });
+const fontsReady = (async()=>{ try{ await Promise.race([Promise.all([
+  document.fonts.load('700 128px "Playfair Display"'), document.fonts.load('500 56px "Cormorant Garamond"'), document.fonts.load('italic 600 62px "Cormorant Garamond"')
+]), new Promise(r=>setTimeout(r,4000))]); }catch(e){} })();
+
+async function renderCard(k, opts={}){
+  await Promise.all([fontsReady, sigReady]);
+  const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  const pick = pickFor(k, opts.qShift||0, opts.sShift||0), rng = mulberry(pick.seed);
+  ctx.save(); ctx.clearRect(0,0,W,H);
+  const layout = (pick.theme ? FEST_SCENES[pick.theme](ctx,rng) : SCENES[pick.scene].draw(ctx,rng,pick.dawn)) || {};
+  ctx.restore(); ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
+  drawText(ctx, pick, opts.customQuote || pick.quote, layout);
+  return { pick, dataURL: cv.toDataURL('image/jpeg', .92) };
+}
+window.renderCard = renderCard;
+
+/* ---------- UI ---------- */
+const $ = id => document.getElementById(id);
+const state = { key: cardDayKey(), qShift:0, sShift:0, custom:'' };
+const hashKey = (location.hash||'').slice(1); if(/^\d{4}-\d{2}-\d{2}$/.test(hashKey)) state.key = hashKey;
+const fmt = (k,o) => fromKey(k).toLocaleDateString('en-IN', o||{weekday:'long', day:'numeric', month:'long', year:'numeric'});
+let lastRender = null, renderSeq = 0;
+
+async function refresh(){
+  const seq = ++renderSeq; $('loading').hidden = false;
+  const out = await renderCard(state.key, {qShift:state.qShift, sShift:state.sShift, customQuote:state.custom});
+  if(seq !== renderSeq) return;
+  lastRender = out; $('cardImg').src = out.dataURL; $('loading').hidden = true;
+  const today = cardDayKey(), p = out.pick;
+  $('dayLabel').textContent = state.key === today ? "Today's card · " + fmt(state.key,{weekday:'short',day:'numeric',month:'short'}) : fmt(state.key,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  $('todayRow').hidden = state.key === today;
+  const st = $('status'); st.textContent = '';
+  const chip = document.createElement('span'); chip.className = 'chip' + (p.theme ? ' fest' : '');
+  chip.textContent = p.theme ? p.fest.name : (p.fest ? p.fest.name + ' · everyday look' : SCENES[p.scene].label); st.appendChild(chip);
+  if(state.key === today){ const s=document.createElement('span'); s.className='note'; s.textContent='Next card at 12:00 AM'; st.appendChild(s); }
+  else if(state.key > today){ const s=document.createElement('span'); s.className='note'; s.textContent='Preview of an upcoming day'; st.appendChild(s); }
+  document.getElementById('quoteText').value = state.custom || p.quote;
+  window.cardReady = true;
+}
+function go(delta){ const d = fromKey(state.key); d.setDate(d.getDate()+delta); state.key = keyOf(d); state.qShift = state.sShift = 0; state.custom=''; refresh(); }
+function toast(msg){ $('toast').textContent = msg; clearTimeout(toast.t); toast.t = setTimeout(()=>$('toast').textContent='', 5000); }
+
+$('prevDay').onclick = () => go(-1);
+$('nextDay').onclick = () => go(1);
+$('goToday').onclick = () => { state.key = cardDayKey(); state.qShift=state.sShift=0; state.custom=''; refresh(); };
+$('newQuote').onclick = () => { state.qShift++; state.custom=''; refresh(); };
+$('newScene').onclick = () => { state.sShift++; refresh(); };
+$('editQuote').onclick = () => { $('editor').hidden = !$('editor').hidden; if(!$('editor').hidden) $('quoteText').focus(); };
+$('applyQuote').onclick = () => { const t = $('quoteText').value.trim().replace(/^["“]|["”]$/g,''); state.custom = t; refresh(); };
+$('resetQuote').onclick = () => { state.custom=''; state.qShift=0; refresh(); };
+
+function cardFile(){
+  const b64 = lastRender.dataURL.split(',')[1], bin = atob(b64), bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return new File([bytes], `good-morning-${state.key}.jpg`, {type:'image/jpeg'});
+}
+function downloadCard(){
+  const a = document.createElement('a'); a.href = lastRender.dataURL; a.download = `good-morning-${state.key}.jpg`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+const canShareFiles = (()=>{ try{ return !!(navigator.canShare && navigator.canShare({files:[new File([new Uint8Array(1)],'t.jpg',{type:'image/jpeg'})]})); }catch(e){ return false; } })();
+if(!canShareFiles){
+  $('saveBtn').textContent = 'Download card'; $('dlBtn').hidden = true;
+  $('howto').innerHTML = 'This browser can\u2019t share images directly. Tap <b>Download card</b>, then send it from WhatsApp. For one-tap sharing open this app in <b>Chrome</b> (Android) or <b>Safari</b> (iPhone).';
+}
+$('saveBtn').onclick = async () => {
+  if(!lastRender) return;
+  if(!canShareFiles){ downloadCard(); toast('Downloaded. Open WhatsApp and attach it from your gallery.'); return; }
+  try{
+    await navigator.share({ files: [cardFile()] });
+  }catch(e){
+    if(e && e.name === 'AbortError') return;          // user closed the share sheet
+    downloadCard(); toast('Sharing didn\u2019t open, so the card was downloaded instead.');
+  }
+};
+$('dlBtn').onclick = () => { if(lastRender){ downloadCard(); toast('Downloaded to your phone.'); } };
+
+// upcoming festivals
+(function(){
+  const today = cardDayKey(), items = [];
+  for(const f of FESTIVALS) for(const d of f.dates){ const s = typeof d==='string'? d : d[0]; const e = typeof d==='string'? d : d[1]; if(e >= today) items.push({f, s}); }
+  items.sort((a,b)=>a.s<b.s?-1:1);
+  const ul = $('fests');
+  items.slice(0,8).forEach(({f,s})=>{ const li=document.createElement('li'), b=document.createElement('button');
+    const days = dayNum(s) - dayNum(today);
+    b.innerHTML = `<span class="d"></span><span class="n"></span><span class="a"></span>`;
+    b.querySelector('.d').textContent = fmt(s,{day:'numeric',month:'short'}); b.querySelector('.n').textContent = f.name;
+    b.querySelector('.a').textContent = days<=0 ? 'today' : days===1 ? 'tomorrow' : `in ${days} days`;
+    b.onclick = () => { state.key = s < today ? today : s; state.qShift=state.sShift=0; state.custom=''; refresh(); window.scrollTo({top:0,behavior:'smooth'}); };
+    li.appendChild(b); ul.appendChild(li); });
+})();
+
+refresh();
+
+// switch to the new day's card on its own at midnight, even if the page is left open
+let shownToday = cardDayKey();
+function rollover(){ const t = cardDayKey(); if(t !== shownToday){ const wasOnToday = state.key === shownToday; shownToday = t;
+  if(wasOnToday){ state.key = t; state.qShift = state.sShift = 0; state.custom = ''; } refresh(); } }
+setInterval(rollover, 30000);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) rollover(); });
+
+if('serviceWorker' in navigator){ window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
+</script>
+</body></html>
